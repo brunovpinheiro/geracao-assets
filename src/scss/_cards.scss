@@ -7,15 +7,15 @@
 		border-radius: inherit;
 		pointer-events: none;
 	}
-	&:before {
-		border: 1px solid var(--alpha-color-brand--red-10);
-		left: 0;
-		top: 0;
-		width: calc(100% - 2px);
-		height: calc(100% - 2px);
-	}
+	// &:before {
+	// 	border: 1px solid var(--alpha-color-brand--red-5);
+	// 	left: 0;
+	// 	top: 0;
+	// 	width: calc(100% - 2px);
+	// 	height: calc(100% - 2px);
+	// }
 	&:after {
 		inset: 0;
-		box-shadow: inset 0 1px 1px 0 rgba(234, 199, 199, 0.12), inset 0 24px 48px 0 rgba(234, 199, 199, 0.08);
+		box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.04), inset 0 24px 48px 0 rgba(255, 255, 255, 0.01);
 	}
 }
