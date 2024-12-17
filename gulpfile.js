@@ -16,7 +16,9 @@ const paths = {
 		// Scripts de vendors que já estão compilados
 		vendor: ["node_modules/gsap/dist/gsap.min.js", "node_modules/gsap/dist/ScrollTrigger.min.js", "node_modules/split-type/umd/index.min.js", "node_modules/particles.js/particles.js"],
 		// Seus scripts que precisam ser compilados
-		src: ["src/js/main.js", "src/js/animation-manager.js"],
+		src: ["src/js/main.js"],
+		//home
+		srcHome: ["src/js/home-animations.js"],
 		dest: "dist/js",
 	},
 };
@@ -38,6 +40,11 @@ function styles() {
 // Processar scripts vendors (sem compilação Babel)
 function vendorScripts() {
 	return gulp.src(paths.scripts.vendor).pipe(concat("vendor.min.js")).pipe(gulp.dest(paths.scripts.dest));
+}
+
+// Processar scripts home (sem compilação Babel)
+function homeScripts() {
+	return gulp.src(paths.scripts.srcHome).pipe(concat("home.min.js")).pipe(gulp.dest(paths.scripts.dest));
 }
 
 // Processar seus scripts (com compilação Babel)
@@ -68,14 +75,15 @@ function appScripts() {
 // Observar alterações
 function watch() {
 	gulp.watch(paths.styles.src, styles);
-	gulp.watch(paths.scripts.src, gulp.series(vendorScripts, appScripts));
+	gulp.watch(paths.scripts.src, gulp.series(vendorScripts, homeScripts, appScripts));
 }
 
 // Tarefas
 exports.styles = styles;
 exports.vendorScripts = vendorScripts;
 exports.appScripts = appScripts;
-exports.scripts = gulp.series(vendorScripts, appScripts);
+exports.homeScripts = homeScripts;
+exports.scripts = gulp.series(vendorScripts, homeScripts, appScripts);
 exports.watch = watch;
 exports.build = gulp.parallel(styles, exports.scripts);
 exports.default = gulp.series(exports.build, watch);

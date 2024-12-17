@@ -66,3 +66,9 @@ html:not(.site-scrollbar) {
 		}
 	}
 }
+
+// MENU SOLUCOES
+.menu-solucoes_overlay.open {
+	opacity: 1;
+	transform: translate(0, 0);
+}

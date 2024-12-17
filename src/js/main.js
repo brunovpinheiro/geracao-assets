@@ -89,3 +89,8 @@ accordionHeadings.forEach((heading) => {
 		accordionItem.setAttribute("data-expand", "true");
 	});
 });
+
+// SOLUCOES MENU
+$(".menu-solucoes").on("click", function () {
+	$(".menu-solucoes_overlay").toggleClass("open");
+});
