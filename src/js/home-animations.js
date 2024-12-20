@@ -1,3 +1,4 @@
+//BRUNO
 // Gerenciador de Animações
 const SlideAnimations = {
 	// Configurações padrão das animações
