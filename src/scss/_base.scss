@@ -24,6 +24,12 @@ html.lenis {
 	transition: transform 0.3s ease;
 }
 
+// HEADER
+.nav_component.is-scroll {
+	background: rgba(12, 17, 29, 0.6);
+	backdrop-filter: blur(16px);
+}
+
 // MAIN SWIPER
 html:not(.site-scrollbar) {
 	.main-swiper > .swiper-wrapper > .swiper-slide {
@@ -67,8 +73,37 @@ html:not(.site-scrollbar) {
 	}
 }
 
+// TITLE GRADIENT
+.title-gradient .word .char {
+	background-image: linear-gradient(0deg, var(--base-color-brand--red-lightest), white);
+	-webkit-text-fill-color: transparent;
+	-webkit-background-clip: text;
+	background-clip: text;
+}
+
+// PAGE CONTENT
+.page-content {
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		margin-bottom: 1rem;
+	}
+	p {
+		margin-bottom: 1rem;
+	}
+}
+
 // MENU SOLUCOES
 .menu-solucoes_overlay.open {
 	opacity: 1;
 	transform: translate(0, 0);
+}
+
+.menu-solucoes_item-icon video {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
 }

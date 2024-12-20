@@ -14,7 +14,8 @@ const paths = {
 	},
 	scripts: {
 		// Scripts de vendors que já estão compilados
-		vendor: ["node_modules/gsap/dist/gsap.min.js", "node_modules/gsap/dist/ScrollTrigger.min.js", "node_modules/split-type/umd/index.min.js", "node_modules/particles.js/particles.js"],
+		vendor: ["node_modules/gsap/dist/gsap.min.js", "node_modules/gsap/dist/ScrollTrigger.min.js", "node_modules/particles.js/particles.js"],
+		// vendor: ["node_modules/gsap/dist/gsap.min.js", "node_modules/gsap/dist/ScrollTrigger.min.js", "node_modules/split-type/umd/index.min.js", "node_modules/particles.js/particles.js"],
 		// Seus scripts que precisam ser compilados
 		src: ["src/js/main.js"],
 		//home

@@ -14,6 +14,33 @@ function raf(time) {
 }
 requestAnimationFrame(raf);
 
+// Manipula os cliques em links internos
+document.addEventListener("click", (e) => {
+	// Verifica se é um link
+	const link = e.target.closest("a");
+	if (!link) return;
+
+	// Verifica se é um link interno (começa com #)
+	const href = link.getAttribute("href");
+	if (!href?.startsWith("#")) return;
+
+	// Previne o comportamento padrão
+	e.preventDefault();
+
+	// Remove o # do início do href para obter o id
+	const targetId = href.substring(1);
+	const targetElement = document.getElementById(targetId);
+
+	// Se o elemento existir, faz o scroll
+	if (targetElement) {
+		lenis.scrollTo(targetElement, {
+			offset: -80, // Ajuste conforme necessário
+			duration: 2,
+			easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+		});
+	}
+});
+
 // NAVBAR SCROLL
 $(window).on("scroll", function () {
 	let scrollPosition = $(window).scrollTop();
@@ -26,50 +53,11 @@ $(window).on("scroll", function () {
 	}
 });
 
-// SPLIT TEXT ANIMATIONS
-let splitType = new SplitType("[data-text-split]", { types: "lines, words", tagName: "span" });
-
-$("[data-text-split]").each(function (index) {
-	let tl = gsap.timeline({
-		scrollTrigger: {
-			trigger: $(this),
-			start: "top bottom", // Trigger animation when top of element hits bottom of viewport
-			end: "top 80%", // End when element is 70% from the top of the viewport
-			toggleActions: "none play none reset",
-		},
-	});
-
-	// Make the text visible before animation starts
-	tl.set($(this), { visibility: "visible" });
-
-	// Animate each line with a stagger between them
-	tl.from($(this).find(".line"), {
-		opacity: 0,
-		yPercent: 100,
-		duration: 0.6,
-		ease: "power2.out",
-		stagger: { each: 0.2 }, // Stagger of 200ms between each line
-	});
-
-	// Animate words inside the lines with another stagger
-	tl.from(
-		$(this).find(".word"),
-		{
-			opacity: 0,
-			yPercent: 100,
-			duration: 0.4,
-			ease: "power2.out",
-			stagger: { each: 0.05 }, // Stagger of 50ms between each word
-		},
-		"<"
-	); // "<" means both animations start at the same time
-});
-
 // SWIPER DEPOIMENTOS
-const swiperDepoimentos = new Swiper(".swiper-depoimentos", {
-	slidesPerView: 3,
-	spaceBetween: 30,
-});
+// const swiperDepoimentos = new Swiper(".swiper-depoimentos", {
+// 	slidesPerView: 3,
+// 	spaceBetween: 30,
+// });
 
 // ACCORDION
 const accordionHeadings = document.querySelectorAll(".accordion_item-heading");
@@ -91,6 +79,48 @@ accordionHeadings.forEach((heading) => {
 });
 
 // SOLUCOES MENU
-$(".menu-solucoes").on("click", function () {
+$(".nav_menu_solucoes").on("click", function () {
 	$(".menu-solucoes_overlay").toggleClass("open");
 });
+
+// Create a timeline for the menu solutions animation
+const menuSolucoesTimeline = gsap.timeline({
+	paused: true,
+});
+
+// Add the stagger animation to the timeline
+menuSolucoesTimeline.from(".menu-solucoes > *", {
+	y: -30,
+	opacity: 0,
+	duration: 0.6,
+	stagger: 0.3,
+	ease: "power2.out",
+});
+
+// Function to handle menu overlay animation
+function handleMenuSolucoesAnimation() {
+	const menuOverlay = document.querySelector(".menu-solucoes_overlay");
+
+	// Create a MutationObserver to watch for class changes
+	const observer = new MutationObserver((mutations) => {
+		mutations.forEach((mutation) => {
+			if (mutation.attributeName === "class") {
+				const isOpen = menuOverlay.classList.contains("open");
+
+				if (isOpen) {
+					menuSolucoesTimeline.restart();
+				} else {
+					menuSolucoesTimeline.reverse();
+				}
+			}
+		});
+	});
+
+	// Start observing the menu overlay element
+	observer.observe(menuOverlay, {
+		attributes: true,
+	});
+}
+
+// Initialize the animation handler
+handleMenuSolucoesAnimation();
