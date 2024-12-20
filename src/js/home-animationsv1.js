@@ -479,10 +479,6 @@ const swiper = new Swiper(".main-swiper", {
 				touchAttempts = 0;
 			}
 		},
-		reachEnd: function () {
-			console.log("Fim do swiper detectado no reachEnd.");
-			scrollManager.enableScrolling();
-		},
 	},
 });
 
@@ -531,6 +527,7 @@ window.addEventListener(
 );
 
 // Touch events
+
 window.addEventListener(
 	"touchstart",
 	(e) => {
