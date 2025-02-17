@@ -1,4 +1,3 @@
-//BRUNO
 // Gerenciador de Animações
 const SlideAnimations = {
 	// Configurações padrão das animações
@@ -365,13 +364,15 @@ const scrollManager = {
 		if (window.scrollY <= 50 && !this.isTransitioning) {
 			this.isTransitioning = true;
 
-			// Scroll suave até o topo
+			// Scroll suave até o topo com delay
 			await new Promise((resolve) => {
 				lenis.scrollTo(0, {
 					duration: 1.2,
 					easing: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)),
+					onComplete: () => {
+						setTimeout(resolve, 300); // Delay de 300ms antes de continuar
+					},
 				});
-				setTimeout(resolve, 1200);
 			});
 
 			const mainSwiper = document.querySelector(".main-swiper");
@@ -383,29 +384,28 @@ const scrollManager = {
 				return rect.top >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight);
 			};
 
-			// Aguarda visibilidade
+			// Aguarda visibilidade com delay adicional
 			await new Promise((resolve) => {
 				const check = setInterval(() => {
 					if (checkVisibility()) {
 						clearInterval(check);
-						resolve();
+						setTimeout(resolve, 200); // Delay adicional de 200ms
 					}
 				}, 100);
 			});
 
 			this.disable();
 			isScrollEnabled = false;
-			scrollAttempts = 0;
-			touchAttempts = 0;
 
 			if (swiper.activeIndex !== this.lastActiveIndex) {
 				swiper.slideTo(this.lastActiveIndex, 0);
 
+				// Delay antes de iniciar a animação do slide
 				setTimeout(() => {
 					if (slides[this.lastActiveIndex]?.timeline) {
 						slides[this.lastActiveIndex].timeline.play();
 					}
-				}, 100);
+				}, 400); // Delay de 400ms antes de iniciar a animação
 			}
 
 			this.isTransitioning = false;
@@ -429,19 +429,25 @@ const scrollManager = {
 	},
 
 	enableScrolling() {
-		isScrollEnabled = true;
-		this.enable();
+		const lastSlideTimeline = slides[slides.length - 1].timeline;
 
-		// Ajuste suave para dispositivos móveis
-		lenis.scrollTo(window.innerHeight, {
-			duration: 1,
-			easing: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)),
-			onComplete: () => {
-				// Garante que o scroll esteja habilitado após a transição
-				document.body.style.overflow = "auto";
-				document.body.style.position = "static";
-			},
-		});
+		if (lastSlideTimeline.progress() === 1) {
+			isScrollEnabled = true;
+			this.enable();
+
+			lenis.scrollTo(window.innerHeight, {
+				duration: 1.2,
+				easing: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)),
+				lock: true,
+				immediate: false,
+				delay: 0.2, // Pequeno delay na transição para o scroll
+				onComplete: () => {
+					document.body.style.overflow = "auto";
+					document.body.style.position = "static";
+					lenis.start();
+				},
+			});
+		}
 	},
 };
 
@@ -489,8 +495,6 @@ const swiper = new Swiper(".main-swiper", {
 
 // Variáveis de controle
 let isScrollEnabled = false;
-let scrollAttempts = 0;
-let touchAttempts = 0;
 
 // Adicionar aqui a verificação de dispositivo móvel
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -498,9 +502,6 @@ const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/
 // Ajustes específicos para mobile
 if (isMobile) {
 	scrollManager.touchThreshold = 30;
-	scrollAttempts = 0;
-	touchAttempts = 0;
-	// Outros ajustes específicos para mobile que você queira adicionar
 }
 
 // Eventos de scroll com Lenis
@@ -508,22 +509,17 @@ lenis.on("scroll", () => {
 	scrollManager.handleReturnToTop();
 });
 
-// Detecção de scroll no final do swiper
+// Ajuste no evento wheel
 window.addEventListener(
 	"wheel",
 	function (e) {
 		if (swiper.isEnd) {
 			if (e.deltaY > 0) {
-				scrollAttempts++;
+				const lastSlideTimeline = slides[slides.length - 1].timeline;
 
-				if (scrollAttempts > 1 && !isScrollEnabled) {
-					isScrollEnabled = true;
-					scrollManager.enable();
-
-					lenis.scrollTo(window.innerHeight + 50, {
-						duration: 1.5,
-						easing: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)),
-					});
+				// Remove a necessidade de múltiplos scrolls
+				if (lastSlideTimeline.progress() === 1 && !isScrollEnabled) {
+					scrollManager.enableScrolling();
 				}
 			}
 		}
@@ -544,13 +540,12 @@ window.addEventListener(
 let touchDirection = null;
 let lastTouchY = 0;
 
+// Ajuste no evento touchmove
 window.addEventListener(
 	"touchmove",
 	(e) => {
-		// Lógica do handleTouchMove
 		scrollManager.handleTouchMove(e);
 
-		// Lógica da detecção de direção
 		const currentTouchY = e.touches[0].clientY;
 
 		if (lastTouchY) {
@@ -560,9 +555,10 @@ window.addEventListener(
 		lastTouchY = currentTouchY;
 
 		if (swiper.isEnd && touchDirection === "up") {
-			touchAttempts++;
+			const lastSlideTimeline = slides[slides.length - 1].timeline;
 
-			if (touchAttempts > 0 && !isScrollEnabled) {
+			// Remove a necessidade de múltiplos toques
+			if (lastSlideTimeline.progress() === 1 && !isScrollEnabled) {
 				scrollManager.enableScrolling();
 			}
 		}
@@ -585,8 +581,6 @@ swiper.on("slideChange", function () {
 	scrollManager.lastActiveIndex = swiper.activeIndex;
 	isScrollEnabled = false;
 	scrollManager.disable();
-	scrollAttempts = 0;
-	touchAttempts = 0;
 });
 
 // Inicialização de slides e animações
@@ -633,4 +627,15 @@ window.addEventListener("load", () => {
 	if (slides[0]?.timeline) {
 		slides[0].timeline.play();
 	}
+});
+
+// Modifique o evento reachEnd do Swiper
+swiper.on("reachEnd", function () {
+	const lastSlideTimeline = slides[slides.length - 1].timeline;
+
+	// Aguarda a animação terminar antes de permitir o scroll
+	lastSlideTimeline.eventCallback("onComplete", () => {
+		scrollAttempts = 0;
+		touchAttempts = 0;
+	});
 });
